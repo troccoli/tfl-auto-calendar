@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\DTOs\Shift;
+use App\DTOs\Duty;
 use App\DTOs\Week;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -45,19 +45,20 @@ class ParseRotaPdf
                     $starts = explode('|', $lines[$line + 1]);
                     $ends = explode('|', $lines[$line + 2]);
 
-                    $shifts = new Collection();
+                    $duties = new Collection();
                     for ($day = 2; $day <= 8; $day++) {
                         $carbonDay = self::DAYS[$day];
-                        if (trim($days[$day]) === 'R') {
-                            $shifts->put($carbonDay, new Shift($carbonDay, true));
+                        $number = trim($days[$day]);
+                        if ($number === 'R') {
+                            $duties->put($carbonDay, new Duty($carbonDay, null, true));
                             continue;
                         }
 
                         $start = trim($starts[$day]);
                         $end = trim($ends[$day]);
-                        $shifts->put($carbonDay, new Shift($carbonDay, false, $start, $end));
+                        $duties->put($carbonDay, new Duty($carbonDay, $number, false, $start, $end));
                     }
-                    $rotas->put($week, new Week($week, false, $shifts));
+                    $rotas->put($week, new Week($week, false, $duties));
                 }
             } catch (CouldNotExtractText $e) {
                 break;
