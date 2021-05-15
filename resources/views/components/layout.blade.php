@@ -14,12 +14,12 @@
 
     <!-- Google Material Design Icons -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
     @stack('styles')
+    <livewire:styles />
 
-    <!-- Scripts -->
     <script src="{{ asset('js/app.js') }}" defer></script>
-
     @stack('scripts')
 </head>
 <body class="antialiased">
@@ -39,6 +39,8 @@
         </div>
     </div>
 </div>
+<!-- Scripts -->
+<livewire:scripts />
 @stack('javascript')
 </body>
 </html>

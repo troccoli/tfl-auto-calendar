@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\JobCreated;
+use App\Models\Job;
 use App\Services\Rota;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
@@ -32,6 +35,14 @@ class GenerateEventsController extends Controller
             'end-date.after' => 'The end date must be after the start date',
         ]);
 
-        var_dump($request->input());
+        $job = Job::createJob(
+            Carbon::parse($request->input('start-date')),
+            Carbon::parse($request->input('end-data')),
+            $request->get('position')
+        );
+
+        JobCreated::dispatch($job);
+
+        return redirect()->route('dashboard');
     }
 }
