@@ -38,6 +38,12 @@
             {{ $slot }}
         </div>
     </div>
+    @if(Route::currentRouteName() !== 'home')
+        <a href="{{ route('home') }}"
+           class="absolute left-4 top-9 flex items-center justify-center h-12 w-12 rounded-md bg-indigo-500 text-white">
+            <span class="material-icons-outlined h-6 w-6">home</span>
+        </a>
+    @endif
 </div>
 <!-- Scripts -->
 <livewire:scripts />
