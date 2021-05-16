@@ -5,11 +5,9 @@ namespace App\Listeners;
 use App\Events\EventsGenerated;
 use App\Events\EventsSent;
 use App\Events\JobCreated;
-use App\Events\JobFinished;
 use App\Jobs\GenerateEvents;
 use App\Jobs\SendEventsToGoogle;
 use Illuminate\Events\Dispatcher;
-use Illuminate\Support\Facades\Log;
 
 class JobEventsSubscriber
 {
@@ -45,6 +43,5 @@ class JobEventsSubscriber
     public function finishJob($event): void
     {
         $event->job->completed();
-        JobFinished::dispatch($event->job);
     }
 }
