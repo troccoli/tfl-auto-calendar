@@ -1,4 +1,4 @@
-<div >
+<div>
     <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">
         <tr>
@@ -31,8 +31,12 @@
         <tbody class="bg-white divide-y divide-gray-200">
         @forelse($jobs as $job)
             <tr>
-                <td class="py-4 text-center align-middle whitespace-nowrap"><x-job-status-icon :job="$job"/></td>
-                <td class="px-6 pb-2 whitespace-nowrap"><x-job-status :job="$job"/></td>
+                <td class="py-4 text-center align-middle whitespace-nowrap">
+                    <x-job-status-icon :job="$job"/>
+                </td>
+                <td class="px-6 pb-2 whitespace-nowrap">
+                    <x-job-status :job="$job"/>
+                </td>
                 <td class="px-6 pb-2 whitespace-nowrap">{{ $job->getStart()->format('Y-m-d') }}</td>
                 <td class="px-6 pb-2 whitespace-nowrap">{{ $job->getEnd()->format('Y-m-d') }}</td>
                 <td class="px-6 pb-2 whitespace-nowrap">{{ $job->getPosition() }}</td>

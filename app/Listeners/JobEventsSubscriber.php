@@ -31,7 +31,6 @@ class JobEventsSubscriber
 
     public function generateEvents(JobCreated $event): void
     {
-        $event->job->started();
         GenerateEvents::dispatch($event->job);
     }
 
