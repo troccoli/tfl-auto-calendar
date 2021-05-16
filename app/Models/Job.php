@@ -69,4 +69,26 @@ class Job extends Model
     {
         return $this->status === self::FAILED;
     }
+
+    public function started(): void
+    {
+        $this->changeStatus(self::PROCESSING);
+    }
+
+    public function failed(): void
+    {
+        $this->changeStatus(self::FAILED);
+    }
+
+    public function completed(): void
+    {
+        $this->changeStatus(self::FINISHED);
+    }
+
+    private function changeStatus(int $status): void
+    {
+        $this->status = $status;
+        $this->save();
+        $this->refresh();
+    }
 }
