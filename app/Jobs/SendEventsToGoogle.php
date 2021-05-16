@@ -22,11 +22,32 @@ class SendEventsToGoogle implements ShouldQueue
 
     public function handle(): void
     {
-        // does it job
-        $delay = mt_rand(2,10);
-        Log::info("Sending events for job {$this->eventsJob->id}. It will take $delay seconds.");
-        sleep($delay);
-        Log::info("Events sent");
+        $this->updateTotalNumberOfEvents();
+
+        $this->eventsJob->sending();
+        $this->sendEvents();
+        $this->eventsJob->eventsSent();
+
         EventsSent::dispatch($this->eventsJob);
+    }
+
+    private function updateTotalNumberOfEvents(): void
+    {
+        $end = $this->eventsJob->getEnd()->clone()->addWeek();
+        $shifts = $end->diffInDays($this->eventsJob->getStart());
+
+        $this->eventsJob->setNumberOfEventsToSend($shifts);
+    }
+
+    private function sendEvents(): void
+    {
+        Log::info("Sending {$this->eventsJob->total_events} events");
+
+        $start = $this->eventsJob->getStart()->clone();
+        for ($day = 1; $day <= $this->eventsJob->total_events; $day++) {
+            sleep(1);
+            $start->addDay();
+            $this->eventsJob->incrementNumberOfEvents();
+        }
     }
 }

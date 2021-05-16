@@ -36,8 +36,8 @@ class GenerateEventsController extends Controller
         ]);
 
         $job = Job::createJob(
-            Carbon::parse($request->input('start-date')),
-            Carbon::parse($request->input('end-data')),
+            Carbon::createFromFormat('D M d Y', $request->input('start-date')),
+            Carbon::createFromFormat('D M d Y', $request->input('end-date')),
             $request->get('position')
         );
 
