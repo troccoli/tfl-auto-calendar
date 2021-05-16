@@ -6,15 +6,19 @@ use Illuminate\Support\Collection;
 
 class Week
 {
-    private int $number;
-    private bool $leaveCover;
-    private Collection $shifts;
-
-    public function __construct(int $number, bool $leaveCover, ?Collection $shifts = null)
+    protected function __construct(private int $number, private bool $leaveCover, private ?Collection $duties = null)
     {
-        $this->number = $number;
-        $this->leaveCover = $leaveCover;
-        $this->shifts = $shifts ?? new Collection();
+        $this->duties = $duties ?? new Collection();
+    }
+
+    static public function createLeaveCoverWeek(int $number): self
+    {
+        return new Week($number, true, null);
+    }
+
+    static public function createWeekWithDuties(int $number, Collection $duties): Week
+    {
+        return new Week($number, false, $duties);
     }
 
     public function getNumber(): int
@@ -27,8 +31,8 @@ class Week
         return $this->leaveCover;
     }
 
-    public function getShifts(): Collection
+    public function getDuties(): Collection
     {
-        return $this->shifts;
+        return $this->duties;
     }
 }
