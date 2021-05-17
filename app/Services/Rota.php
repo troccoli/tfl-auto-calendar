@@ -71,6 +71,11 @@ class Rota
         return $this->rota;
     }
 
+    public function getNumberOfPositions(): int
+    {
+        return $this->getRota()->getWeeks()->count();
+    }
+
     private function parseLine(string $firstLine, string $secondLine, string $thirdLine): Week
     {
         $days = explode('|', $firstLine);

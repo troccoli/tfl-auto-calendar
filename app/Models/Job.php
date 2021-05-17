@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Job extends Model
 {
@@ -31,6 +32,11 @@ class Job extends Model
             'position' => $position,
             'status' => self::CREATED,
         ]);
+    }
+
+    public function shiftEvents(): HasMany
+    {
+        return $this->hasMany(ShiftEvent::class);
     }
 
     public function getStart(): Carbon
