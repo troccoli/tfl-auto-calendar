@@ -51,8 +51,8 @@
             rota file. Then choose the date for the last shift. Note that both dates must be a Sunday.
         </p>
         <p class="mt-4 text-left">
-            For your convenience the current rota starts on {{ $rotaStartDate->format('d/m/y') }} and the shifts for
-            position 1 are:
+            For your convenience the current rota starts on {{ $rotaStartDate->format('d/m/y') }}, there are {{ $lastPosition }}
+            positions and the shifts for position 1 are:
         </p>
 
         <div class="mt-4 py-2 align-middle inline-block justify-center px-2">
