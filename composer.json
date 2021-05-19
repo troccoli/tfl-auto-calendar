@@ -12,6 +12,7 @@
         "laravel/framework": "^8.12",
         "laravel/tinker": "^2.5",
         "livewire/livewire": "^2.4",
+        "spatie/laravel-google-calendar": "^3.3",
         "spatie/pdf-to-text": "^1.4"
     },
     "require-dev": {
