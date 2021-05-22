@@ -13,9 +13,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-})->name('home');
+Route::view('/', 'welcome')
+    ->name('home');
 
 Route::get('/generate-events', [\App\Http\Controllers\GenerateEventsController::class, 'getForm'])
     ->name('generate-events');
@@ -23,3 +22,6 @@ Route::post('/generate-events', [\App\Http\Controllers\GenerateEventsController:
 
 Route::view('/dashboard', 'dashboard')
     ->name('dashboard');
+
+Route::view('/holidays', 'holidays')
+    ->name('holidays');
