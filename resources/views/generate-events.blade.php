@@ -1,48 +1,3 @@
-@push('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/pikaday/pikaday.js"></script>
-@endpush
-@push('styles')
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/pikaday/css/pikaday.css">
-@endpush
-
-@push('javascript')
-    <script>
-        var startPicker = new Pikaday({
-            field: document.getElementById('start-date'),
-            firstDay: 1,
-            disableDayFn: function (date) {
-                if (date.getDay() > 0) {
-                    return true;
-                }
-                let now = new Date();
-                now.setHours(0, 0, 0, 0);
-                if (now.getTime() > date.getTime()) {
-                    return true;
-                }
-                return false;
-            }
-        });
-        var endPicker = new Pikaday({
-            field: document.getElementById('end-date'),
-            firstDay: 1,
-            disableDayFn: function (date) {
-                if (date.getDay() > 0) {
-                    return true;
-                }
-                let startDate = startPicker.getDate();
-                if (null === startDate) {
-                    startDate = new Date();
-                }
-                startDate.setHours(0, 0, 0, 0);
-                if (startDate.getTime() > date.getTime()) {
-                    return true;
-                }
-                return false;
-            }
-        });
-    </script>
-@endpush
-
 <x-layout>
     <x-slot name="title">Automatically generate your shifts events</x-slot>
     <x-slot name="intro">
@@ -90,9 +45,21 @@
     <form method="post" action="{{ route('generate-events') }}">
         @csrf
         <div class="flex w-full justify-center space-x-10">
-            <div>
+            <div x-data
+                 x-init="new Pikaday({
+                    field: $refs.startDate,
+                    firstDay: 1,
+                    minDate: new Date(),
+                    disableDayFn: function (date) {
+                        if (date.getDay() > 0) {
+                            return true;
+                        }
+                        return false;
+                    }
+                })"
+            >
                 <label for="start-date" class="block font-medium text-sm text-gray-700">Start date</label>
-                <input name="start-date" type="text" id="start-date"
+                <input name="start-date" type="text" id="start-date" x-ref="startDate"
                        class="mt-2 p-2 block border border-gray-600 rounded form-input rounded-md shadow-sm"/>
                 @error("start-date")
                 <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
@@ -108,9 +75,21 @@
                 @enderror
             </div>
 
-            <div>
+            <div x-data
+                 x-init="new Pikaday({
+                    field: $refs.endDate,
+                    firstDay: 1,
+                    minDate: new Date(),
+                    disableDayFn: function (date) {
+                        if (date.getDay() > 0) {
+                            return true;
+                        }
+                        return false;
+                    }
+                })"
+            >
                 <label for="end-date" class="block font-medium text-sm text-gray-700">End date</label>
-                <input name="end-date" type="text" id="end-date"
+                <input name="end-date" type="text" id="end-date" x-ref="endDate"
                        class="mt-2 p-2 block border border-gray-600 rounded form-input rounded-md shadow-sm"/>
                 @error("end-date")
                 <p class="mt-2 text-sm text-red-600">{{ $message }}</p>

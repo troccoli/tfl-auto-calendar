@@ -27,4 +27,6 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 //     forceTLS: true
 // });
 
-import'alpinejs'
+import 'alpinejs'
+import {Pikaday} from "pikaday-momentless";
+window.Pikaday = Pikaday;

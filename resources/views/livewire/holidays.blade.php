@@ -1,10 +1,3 @@
-@push('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/pikaday/pikaday.js"></script>
-@endpush
-@push('styles')
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/pikaday/css/pikaday.css">
-@endpush
-
 <div>
     <div class="flex justify-center">
         <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -18,7 +11,7 @@
                             </th>
 
                             <th scope="col" class="relative px-6 py-3 text-indigo-500 cursor-pointer"
-                                x-data=""
+                                x-data
                                 x-init="new Pikaday({
                                     field: $refs.addCircle,
                                     firstDay: 1,
