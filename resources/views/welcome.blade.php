@@ -14,8 +14,7 @@
                 <p class="ml-16 text-lg leading-6 font-medium text-gray-900">Generate events</p>
             </dt>
             <dd class="mt-2 ml-16 text-base text-gray-500">
-                This is where you go when you are ready to create your shift on your Google calendar. You will
-                be asked the start date and the position on the rota file.
+                This is where you go when you are ready to create your shift on your Google calendar.
             </dd>
         </div>
 

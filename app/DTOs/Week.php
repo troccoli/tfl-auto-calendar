@@ -2,9 +2,10 @@
 
 namespace App\DTOs;
 
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
 
-class Week
+class Week implements Arrayable
 {
     protected function __construct(private int $number, private bool $leaveCover, private ?Collection $duties = null)
     {
@@ -34,5 +35,14 @@ class Week
     public function getDuties(): Collection
     {
         return $this->duties;
+    }
+
+    public function toArray(): array
+    {
+        return [
+            'number' => $this->number,
+            'is_leave_cover' => $this->leaveCover,
+            'duties' => $this->duties->toArray(),
+        ];
     }
 }
