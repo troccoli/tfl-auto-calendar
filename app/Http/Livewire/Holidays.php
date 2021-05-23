@@ -20,7 +20,7 @@ class Holidays extends Component
 
     public function addHoliday(string $date)
     {
-        $start = Carbon::createFromFormat('Y-n-j', $date)->setTime(0,0,0);
+        $start = Carbon::createFromFormat('Y-n-j', $date)->setTime(0, 0, 0);
         if (Holiday::query()->where('start', $start)->first() === null) {
             Holiday::create([
                 'start' => $start,

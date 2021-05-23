@@ -3,9 +3,11 @@
 namespace App\Http\Livewire;
 
 use App\Events\JobCreated;
+use App\Models\Holiday;
 use App\Models\Job;
 use App\Services\Rota;
 use Carbon\Carbon;
+use Illuminate\Validation\ValidationException;
 use Livewire\Component;
 
 class GenerateEvents extends Component
@@ -13,12 +15,14 @@ class GenerateEvents extends Component
     public $startDate;
     public $endDate;
     public $position;
+    public $holidayPeriods;
 
     private $lastPosition;
 
     public function mount(Rota $service)
     {
         $this->lastPosition = $service->getNumberOfPositions();
+        $this->holidayPeriods = 0;
     }
 
     public function render()
@@ -29,7 +33,7 @@ class GenerateEvents extends Component
     public function getRules(): array
     {
         return [
-            'startDate' => 'required|date',
+            'startDate' => 'required|date|exclude_if:endDate,null|before:endDate',
             'position' => 'required|int|min:1|max:'.$this->lastPosition,
             'endDate' => 'required|date|after:startDate',
         ];
@@ -40,6 +44,7 @@ class GenerateEvents extends Component
         return [
             'startDate.required' => 'Please enter a start date.',
             'startDate.date' => 'Please enter a valid date',
+            'startDate.before' => 'The start date must be before the end date',
             'position.int' => 'The position must be a positive number.',
             'position.min' => 'The position must be a positive number.',
             'position.max' => 'The last possible position is '.$this->lastPosition,
@@ -51,7 +56,13 @@ class GenerateEvents extends Component
 
     public function updated($propertyName)
     {
-        $this->validateOnly($propertyName);
+        try {
+            $this->validateOnly($propertyName);
+            $this->holidayPeriods = $this->checkHolidays();
+        } catch (ValidationException $e) {
+            $this->holidayPeriods = 0;
+            throw $e;
+        }
     }
 
     public function generateEvents(Rota $service)
@@ -67,5 +78,24 @@ class GenerateEvents extends Component
         JobCreated::dispatch($job);
 
         return redirect()->route('dashboard');
+    }
+
+    private function checkHolidays(): int
+    {
+        if (null === $this->startDate) {
+            return 0;
+        }
+        $start = Carbon::createFromFormat('D M d Y', $this->startDate);
+
+        if (null === $this->endDate) {
+            return 0;
+        }
+        $end = Carbon::createFromFormat('D M d Y', $this->endDate);
+
+        if ($start->greaterThanOrEqualTo($end)) {
+            return 0;
+        }
+
+        return Holiday::query()->between($start, $end)->count();
     }
 }
