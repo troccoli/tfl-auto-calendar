@@ -3,8 +3,9 @@
 namespace App\DTOs;
 
 use Carbon\Carbon;
+use Illuminate\Contracts\Support\Arrayable;
 
-class Duty
+class Duty implements Arrayable
 {
     private int $day;
     private ?int $number;
@@ -70,5 +71,17 @@ class Duty
             default:
                 return $this->number >= 49 && $this->number <= 60;
         }
+    }
+
+    public function toArray(): array
+    {
+        return [
+            'day' => $this->day,
+            'number' => $this->number,
+            'start' => $this->start,
+            'end' => $this->end,
+            'is_spare' => $this->isSpare(),
+            'is_rest_day' => $this->isRestDay(),
+        ];
     }
 }

@@ -16,9 +16,8 @@ use Illuminate\Support\Facades\Route;
 Route::view('/', 'welcome')
     ->name('home');
 
-Route::get('/generate-events', [\App\Http\Controllers\GenerateEventsController::class, 'getForm'])
+Route::get('/generate-events', \App\Http\Controllers\GenerateEventsController::class)
     ->name('generate-events');
-Route::post('/generate-events', [\App\Http\Controllers\GenerateEventsController::class, 'generateEvents']);
 
 Route::view('/dashboard', 'dashboard')
     ->name('dashboard');

@@ -27,4 +27,9 @@ class Holiday extends Model
     {
         return $query->orderByDesc('start');
     }
+
+    public function scopeBetween(Builder $query, Carbon $start, Carbon $end): Builder
+    {
+        return $query->whereBetween('start', [$start, $end]);
+    }
 }
