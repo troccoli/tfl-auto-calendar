@@ -28,8 +28,18 @@ class Holiday extends Model
         return $query->orderByDesc('start');
     }
 
+    public function scopeInAscendingOrder(Builder $query): Builder
+    {
+        return $query->orderBy('start');
+    }
+
     public function scopeBetween(Builder $query, Carbon $start, Carbon $end): Builder
     {
         return $query->whereBetween('start', [$start, $end]);
+    }
+
+    public function scopeComingUp(Builder $query): Builder
+    {
+        return $query->where('start', '>=', Carbon::now()->subWeeks(2));
     }
 }

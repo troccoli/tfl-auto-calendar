@@ -13,7 +13,7 @@ class Holidays extends Component
 
     public function render()
     {
-        $holidays = Holiday::query()->inDescendingOrder()->paginate(10);
+        $holidays = Holiday::query()->comingUp()->inAscendingOrder()->paginate(10);
 
         return view('livewire.holidays', compact('holidays'));
     }

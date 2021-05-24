@@ -10,6 +10,7 @@ use Carbon\CarbonInterval;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
+use JetBrains\PhpStorm\Pure;
 use Spatie\PdfToText\Exceptions\CouldNotExtractText;
 use Spatie\PdfToText\Pdf;
 
@@ -26,6 +27,12 @@ class Rota
     ];
 
     private ?RotaDTO $rota = null;
+
+    #[Pure]
+    public static function factory(): self
+    {
+        return new static();
+    }
 
     public function getWeek(int $position): Week
     {
