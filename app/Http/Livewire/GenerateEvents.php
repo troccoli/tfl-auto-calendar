@@ -17,11 +17,8 @@ class GenerateEvents extends Component
     public $position;
     public $holidayPeriods;
 
-    private $lastPosition;
-
-    public function mount(Rota $service)
+    public function mount()
     {
-        $this->lastPosition = $service->getNumberOfPositions();
         $this->holidayPeriods = 0;
     }
 
@@ -32,22 +29,24 @@ class GenerateEvents extends Component
 
     public function getRules(): array
     {
+        $lastPosition = Rota::factory()->getNumberOfPositions();
         return [
             'startDate' => 'required|date|exclude_if:endDate,null|before:endDate',
-            'position' => 'required|int|min:1|max:'.$this->lastPosition,
+            'position' => 'required|int|min:1|max:'.$lastPosition,
             'endDate' => 'required|date|after:startDate',
         ];
     }
 
     public function getMessages(): array
     {
+        $lastPosition = Rota::factory()->getNumberOfPositions();
         return [
             'startDate.required' => 'Please enter a start date.',
             'startDate.date' => 'Please enter a valid date',
             'startDate.before' => 'The start date must be before the end date',
             'position.int' => 'The position must be a positive number.',
             'position.min' => 'The position must be a positive number.',
-            'position.max' => 'The last possible position is '.$this->lastPosition,
+            'position.max' => 'The last possible position is '.$lastPosition,
             'endDate.required' => 'Please enter an end date.',
             'endDate.date' => 'Please enter a valid date',
             'endDate.after' => 'The end date must be after the start date',
