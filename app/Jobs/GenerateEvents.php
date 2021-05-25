@@ -36,9 +36,7 @@ class GenerateEvents implements ShouldQueue
 
     private function updateTotalNumberOfShifts(): void
     {
-        $end = $this->eventsJob->getEnd()->clone()->addWeek();
-        $shifts = $end->diffInDays($this->eventsJob->getStart());
-
+        $shifts = $this->eventsJob->getEnd()->diffInDays($this->eventsJob->getStart()) + 1;
         $this->eventsJob->setNumberOfShiftsToGenerate($shifts);
     }
 
@@ -49,7 +47,7 @@ class GenerateEvents implements ShouldQueue
         $start = $this->eventsJob->getStart()->clone();
         $position = $this->eventsJob->getPosition();
         $lastPosition = $service->getNumberOfPositions();
-        while ($start->lte($this->eventsJob->getEnd())) {
+        while ($start->isBefore($this->eventsJob->getEnd())) {
             $week = $service->getWeek($position);
             if ($week->isLeaveCover()) {
                 ShiftEvent::createAllDayShiftEvent(

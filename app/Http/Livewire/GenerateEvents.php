@@ -5,6 +5,7 @@ namespace App\Http\Livewire;
 use App\Events\JobCreated;
 use App\Models\Holiday;
 use App\Models\Job;
+use App\Rules\DayOfTheWeek;
 use App\Services\Rota;
 use Carbon\Carbon;
 use Illuminate\Validation\ValidationException;
@@ -31,9 +32,9 @@ class GenerateEvents extends Component
     {
         $lastPosition = Rota::factory()->getNumberOfPositions();
         return [
-            'startDate' => 'required|date|exclude_if:endDate,null|before:endDate',
-            'position' => 'required|int|min:1|max:'.$lastPosition,
-            'endDate' => 'required|date|after:startDate',
+            'startDate' => ['required', 'date_format:D M d Y',  new DayOfTheWeek(Carbon::SUNDAY), 'exclude_if:endDate,null', 'before:endDate'],
+            'position' => ['required', 'int', 'min:1', 'max:'.$lastPosition],
+            'endDate' => ['required', 'date_format:D M d Y', new DayOfTheWeek(Carbon::SATURDAY), 'after:startDate'],
         ];
     }
 
@@ -69,8 +70,8 @@ class GenerateEvents extends Component
         $this->validate();
 
         $job = Job::createJob(
-            Carbon::createFromFormat('D M d Y', $this->startDate),
-            Carbon::createFromFormat('D M d Y', $this->endDate),
+            Carbon::parse($this->startDate),
+            Carbon::parse($this->endDate),
             $this->position
         );
 
@@ -84,12 +85,12 @@ class GenerateEvents extends Component
         if (null === $this->startDate) {
             return 0;
         }
-        $start = Carbon::createFromFormat('D M d Y', $this->startDate);
+        $start = Carbon::parse($this->startDate);
 
         if (null === $this->endDate) {
             return 0;
         }
-        $end = Carbon::createFromFormat('D M d Y', $this->endDate);
+        $end = Carbon::parse($this->endDate);
 
         if ($start->greaterThanOrEqualTo($end)) {
             return 0;
