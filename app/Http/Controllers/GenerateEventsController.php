@@ -2,11 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Events\JobCreated;
-use App\Models\Job;
 use App\Services\Rota;
-use Carbon\Carbon;
-use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 class GenerateEventsController extends Controller

@@ -6,10 +6,10 @@
                     firstDay: 1,
                     minDate: new Date(),
                     disableDayFn: function(date) {
-                        if (date.getDay() > 0) {
-                            return true;
+                        if (date.getDay() === 0) {
+                            return false;
                         }
-                        return false;
+                        return true;
                     },
                 })"
         >
@@ -34,12 +34,12 @@
              x-init="new Pikaday({
                     field: $refs.endDate,
                     firstDay: 1,
-                    minDate: new Date(),
+                    minDate: new Date((new Date()).getFullYear(), (new Date()).getMonth(), (new Date()).getDate()+6),
                     disableDayFn: function (date) {
-                        if (date.getDay() > 0) {
-                            return true;
+                        if (date.getDay() === 6) {
+                            return false;
                         }
-                        return false;
+                        return true;
                     }
                 })"
         >
