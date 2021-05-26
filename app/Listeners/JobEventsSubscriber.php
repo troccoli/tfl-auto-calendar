@@ -2,9 +2,11 @@
 
 namespace App\Listeners;
 
+use App\Events\EventsDeleted;
 use App\Events\EventsGenerated;
 use App\Events\EventsSent;
 use App\Events\JobCreated;
+use App\Jobs\DeleteEventsFromGoogle;
 use App\Jobs\GenerateEvents;
 use App\Jobs\SendEventsToGoogle;
 use Illuminate\Events\Dispatcher;
@@ -20,6 +22,11 @@ class JobEventsSubscriber
 
         $dispatcher->listen(
             EventsGenerated::class,
+            [JobEventsSubscriber::class, 'deleteEvents']
+        );
+
+        $dispatcher->listen(
+            EventsDeleted::class,
             [JobEventsSubscriber::class, 'sendEvents']
         );
 
@@ -34,7 +41,12 @@ class JobEventsSubscriber
         GenerateEvents::dispatch($event->job);
     }
 
-    public function sendEvents(EventsGenerated $event): void
+    public function deleteEvents(EventsGenerated $event): void
+    {
+        DeleteEventsFromGoogle::dispatch($event->job);
+    }
+
+    public function sendEvents(EventsDeleted $event): void
     {
         SendEventsToGoogle::dispatch($event->job);
     }

@@ -51,7 +51,7 @@ class GenerateEvents implements ShouldQueue
             if ($week->isLeaveCover()) {
                 ShiftEvent::createAllDayShiftEvent(
                     $this->eventsJob->getId(),
-                    'M (Leave Cover)',
+                    self::EVENT_PREFIX . ' (Leave Cover)',
                     $currentDate,
                     $currentDate->clone()->addWeek()->subDay()
                 );
@@ -69,7 +69,7 @@ class GenerateEvents implements ShouldQueue
                     [$startDateTime, $endDateTime] = $this->calculateDateTimes($currentDate, $duty);
                     ShiftEvent::createShiftEvent(
                         $this->eventsJob->getId(),
-                        'M Working'.($duty->isSpare() ? " (Spare)" : ""),
+                        self::EVENT_PREFIX.($duty->isSpare() ? " (Spare)" : ""),
                         $startDateTime,
                         $endDateTime
                     );

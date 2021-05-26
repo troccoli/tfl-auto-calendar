@@ -15,6 +15,14 @@
                  class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-indigo-500"></div>
         </div>
     </div>
+@elseif($job->isDeleting())
+    <div class="relative pt-4">
+        <p class="text-indigo-500 test-xs mb-0.5">Deleting</p>
+        <div class="overflow-hidden h-2 mb-4 text-xs flex rounded bg-indigo-200">
+            <div style="width:{{ $job->deletingProgress() }}%"
+                 class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-indigo-500"></div>
+        </div>
+    </div>
 @elseif($job->isSending())
     <div class="relative pt-4">
         <p class="text-indigo-500 test-xs mb-0.5">Sending</p>
