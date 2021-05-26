@@ -28,7 +28,7 @@ class GenerateEvents implements ShouldQueue
     {
         $this->updateTotalNumberOfShifts();
 
-        $this->eventsJob->generating();
+        $this->eventsJob->startedGenerating();
         $this->generateEvents($service);
         $this->eventsJob->eventsGenerated();
 
@@ -56,13 +56,13 @@ class GenerateEvents implements ShouldQueue
                     $currentDate->clone()->addWeek()->subDay()
                 );
                 $currentDate->addWeek();
-                $this->eventsJob->incrementNumberOfShifts(7);
+                $this->eventsJob->incrementNumberOfShiftsGenerated(7);
             } else {
                 /** @var Duty $duty */
                 foreach ($week->getDuties() as $duty) {
                     if ($duty->isRestDay()) {
                         $currentDate->addDay();
-                        $this->eventsJob->incrementNumberOfShifts();
+                        $this->eventsJob->incrementNumberOfShiftsGenerated();
                         continue;
                     }
 
@@ -74,11 +74,11 @@ class GenerateEvents implements ShouldQueue
                         $endDateTime
                     );
                     $currentDate->addDay();
-                    $this->eventsJob->incrementNumberOfShifts();
+                    $this->eventsJob->incrementNumberOfShiftsGenerated();
                 }
             }
             $position = $position === $lastPosition ? 1 : $position + 1;
-            $this->eventsJob->incrementNumberOfShifts();
+            $this->eventsJob->incrementNumberOfShiftsGenerated();
         }
     }
 

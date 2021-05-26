@@ -65,7 +65,7 @@ class Job extends Model
         $this->save();
     }
 
-    public function incrementNumberOfShifts(int $value = 1): void
+    public function incrementNumberOfShiftsGenerated(int $value = 1): void
     {
         $this->generated_shifts += $value;
         $this->save();
@@ -76,13 +76,13 @@ class Job extends Model
         return round($this->generated_shifts / $this->total_shifts * 100);
     }
 
-    public function setNumberOfEventsToSend(int $value): void
+    public function setNumberOfEventsToSendToGoogle(int $value): void
     {
         $this->total_events = $value;
         $this->save();
     }
 
-    public function incrementNumberOfEvents(int $value = 1): void
+    public function incrementNumberOfEventsSentToGoogle(int $value = 1): void
     {
         $this->events_sent += $value;
         $this->save();
@@ -133,7 +133,7 @@ class Job extends Model
         return $this->status === self::FAILED;
     }
 
-    public function generating(): void
+    public function startedGenerating(): void
     {
         $this->changeStatus(self::GENERATING_EVENTS);
     }
@@ -143,7 +143,7 @@ class Job extends Model
         $this->changeStatus(self::EVENTS_GENERATED);
     }
 
-    public function sending(): void
+    public function startedSending(): void
     {
         $this->changeStatus(self::SENDING_EVENTS);
     }

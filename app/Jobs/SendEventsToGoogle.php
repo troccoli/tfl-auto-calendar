@@ -24,7 +24,7 @@ class SendEventsToGoogle implements ShouldQueue
     {
         $this->updateTotalNumberOfEvents();
 
-        $this->eventsJob->sending();
+        $this->eventsJob->startedSending();
         $this->sendEvents();
         $this->eventsJob->eventsSent();
 
@@ -36,7 +36,7 @@ class SendEventsToGoogle implements ShouldQueue
         $end = $this->eventsJob->getEnd()->clone()->addWeek();
         $shifts = $end->diffInDays($this->eventsJob->getStart());
 
-        $this->eventsJob->setNumberOfEventsToSend($shifts);
+        $this->eventsJob->setNumberOfEventsToSendToGoogle($shifts);
     }
 
     private function sendEvents(): void
@@ -47,7 +47,7 @@ class SendEventsToGoogle implements ShouldQueue
         for ($day = 1; $day <= $this->eventsJob->total_events; $day++) {
             sleep(1);
             $start->addDay();
-            $this->eventsJob->incrementNumberOfEvents();
+            $this->eventsJob->incrementNumberOfEventsSentToGoogle();
         }
     }
 }
