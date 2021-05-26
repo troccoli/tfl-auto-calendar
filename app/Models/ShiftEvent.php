@@ -12,7 +12,7 @@ class ShiftEvent extends Model
 {
     use SoftDeletes;
 
-    protected $fillable = ['job_id', 'title', 'start', 'end', 'is_all_day'];
+    protected $fillable = ['job_id', 'title', 'start', 'end', 'is_all_day', 'google_id'];
     protected $dates = ['start', 'end'];
     protected $casts = [
         'is_all_day' => 'boolean',
@@ -57,5 +57,32 @@ class ShiftEvent extends Model
     public function scopeNotForJob(Builder $query, int $jobId): Builder
     {
         return $query->where('job_id', '<>', $jobId);
+    }
+
+    public function getTitle(): string
+    {
+        return $this->title;
+    }
+
+    public function getStart(): Carbon
+    {
+        return $this->start;
+    }
+
+    public function getEnd(): Carbon
+    {
+        return $this->end;
+    }
+
+    public function isAllDayEvent(): bool
+    {
+        return $this->is_all_day;
+    }
+
+    public function setGoogleEventId(string $id): self
+    {
+        $this->google_id = $id;
+
+        return $this;
     }
 }
