@@ -4,17 +4,21 @@ namespace App\Jobs;
 
 use App\Events\EventsSent;
 use App\Models\Job;
+use App\Models\ShiftEvent;
 use Illuminate\Bus\Batchable;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Collection;
+use Spatie\GoogleCalendar\Event;
 
 class SendEventsToGoogle implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, Batchable;
+
+    private Collection $shiftEvents;
 
     public function __construct(public Job $eventsJob)
     {
@@ -24,7 +28,7 @@ class SendEventsToGoogle implements ShouldQueue
     {
         $this->updateTotalNumberOfEvents();
 
-        $this->eventsJob->sending();
+        $this->eventsJob->startedSending();
         $this->sendEvents();
         $this->eventsJob->eventsSent();
 
@@ -33,21 +37,35 @@ class SendEventsToGoogle implements ShouldQueue
 
     private function updateTotalNumberOfEvents(): void
     {
-        $end = $this->eventsJob->getEnd()->clone()->addWeek();
-        $shifts = $end->diffInDays($this->eventsJob->getStart());
-
-        $this->eventsJob->setNumberOfEventsToSend($shifts);
+        $this->shiftEvents = $this->eventsJob->shiftEvents;
+        $this->eventsJob->setNumberOfEventsToSendToGoogle($this->shiftEvents->count());
     }
 
     private function sendEvents(): void
     {
-        Log::info("Sending {$this->eventsJob->total_events} events");
-
-        $start = $this->eventsJob->getStart()->clone();
-        for ($day = 1; $day <= $this->eventsJob->total_events; $day++) {
-            sleep(1);
-            $start->addDay();
-            $this->eventsJob->incrementNumberOfEvents();
+        /** @var ShiftEvent $shiftEvent */
+        foreach ($this->shiftEvents as $shiftEvent) {
+            $googleEvent = $this->sendToGoogle($shiftEvent);
+            $shiftEvent->setGoogleEventId($googleEvent->id);
+            $shiftEvent->save();
+            $this->eventsJob->incrementNumberOfEventsSentToGoogle();
         }
+    }
+
+    private function sendToGoogle(ShiftEvent $shiftEvent): Event
+    {
+        if ($shiftEvent->isAllDayEvent()) {
+            return Event::create([
+                'name' => $shiftEvent->getTitle(),
+                'startDate' => $shiftEvent->getStart()->setTimezone('Europe/London'),
+                'endDate' => $shiftEvent->getEnd()->setTimezone('Europe/London'),
+            ]);
+        }
+
+        return Event::create([
+            'name' => $shiftEvent->getTitle(),
+            'startDateTime' => $shiftEvent->getStart()->setTimezone('Europe/London'),
+            'endDateTime' => $shiftEvent->getEnd()->setTimezone('Europe/London'),
+        ]);
     }
 }

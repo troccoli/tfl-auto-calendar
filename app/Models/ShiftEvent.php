@@ -3,12 +3,16 @@
 namespace App\Models;
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ShiftEvent extends Model
 {
-    protected $fillable = ['job_id', 'title', 'start', 'end', 'is_all_day'];
+    use SoftDeletes;
+
+    protected $fillable = ['job_id', 'title', 'start', 'end', 'is_all_day', 'google_id'];
     protected $dates = ['start', 'end'];
     protected $casts = [
         'is_all_day' => 'boolean',
@@ -38,5 +42,47 @@ class ShiftEvent extends Model
     public function job(): BelongsTo
     {
         return $this->belongsTo(Job::class);
+    }
+
+    public function getGoogleEventId(): string
+    {
+        return $this->google_id;
+    }
+
+    public function scopeBetween(Builder $query, Carbon $start, Carbon $end): Builder
+    {
+        return $query->whereBetween('start', [$start, $end]);
+    }
+
+    public function scopeNotForJob(Builder $query, int $jobId): Builder
+    {
+        return $query->where('job_id', '<>', $jobId);
+    }
+
+    public function getTitle(): string
+    {
+        return $this->title;
+    }
+
+    public function getStart(): Carbon
+    {
+        return $this->start;
+    }
+
+    public function getEnd(): Carbon
+    {
+        return $this->end;
+    }
+
+    public function isAllDayEvent(): bool
+    {
+        return $this->is_all_day;
+    }
+
+    public function setGoogleEventId(string $id): self
+    {
+        $this->google_id = $id;
+
+        return $this;
     }
 }

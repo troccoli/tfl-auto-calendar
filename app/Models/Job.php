@@ -11,10 +11,12 @@ class Job extends Model
     private const CREATED = 1;
     private const GENERATING_EVENTS = 2;
     private const EVENTS_GENERATED = 3;
-    private const SENDING_EVENTS = 4;
-    private const EVENTS_SENT = 5;
-    private const FINISHED = 6;
-    private const FAILED = 7;
+    private const DELETING_EVENTS = 4;
+    private const EVENTS_DELETED = 5;
+    private const SENDING_EVENTS = 6;
+    private const EVENTS_SENT = 7;
+    private const FINISHED = 8;
+    private const FAILED = 9;
 
     protected $fillable = ['start', 'end', 'position', 'status'];
     protected $dates = ['start', 'end'];
@@ -65,7 +67,7 @@ class Job extends Model
         $this->save();
     }
 
-    public function incrementNumberOfShifts(int $value = 1): void
+    public function incrementNumberOfShiftsGenerated(int $value = 1): void
     {
         $this->generated_shifts += $value;
         $this->save();
@@ -76,13 +78,30 @@ class Job extends Model
         return round($this->generated_shifts / $this->total_shifts * 100);
     }
 
-    public function setNumberOfEventsToSend(int $value): void
+    public function setNumberOfEventsToDeleteFromGoogle(int $value): void
+    {
+        $this->total_events_to_delete = $value;
+        $this->save();
+    }
+
+    public function incrementNumberOfEventsDeletedFromGoogle(int $value = 1): void
+    {
+        $this->events_deleted += $value;
+        $this->save();
+    }
+
+    public function deletingProgress(): int
+    {
+        return round($this->events_deleted / $this->total_events_to_delete * 100);
+    }
+
+    public function setNumberOfEventsToSendToGoogle(int $value): void
     {
         $this->total_events = $value;
         $this->save();
     }
 
-    public function incrementNumberOfEvents(int $value = 1): void
+    public function incrementNumberOfEventsSentToGoogle(int $value = 1): void
     {
         $this->events_sent += $value;
         $this->save();
@@ -103,6 +122,8 @@ class Job extends Model
         return in_array($this->status, [
             self::GENERATING_EVENTS,
             self::EVENTS_GENERATED,
+            self::DELETING_EVENTS,
+            self::EVENTS_DELETED,
             self::SENDING_EVENTS,
             self::EVENTS_SENT,
         ]);
@@ -110,12 +131,17 @@ class Job extends Model
 
     public function isWaiting(): bool
     {
-        return in_array($this->status, [self::EVENTS_GENERATED, self::EVENTS_SENT]);
+        return in_array($this->status, [self::EVENTS_GENERATED, self::EVENTS_DELETED, self::EVENTS_SENT]);
     }
 
     public function isGenerating(): bool
     {
         return $this->status === self::GENERATING_EVENTS;
+    }
+
+    public function isDeleting(): bool
+    {
+        return $this->status === self::DELETING_EVENTS;
     }
 
     public function isSending(): bool
@@ -133,7 +159,7 @@ class Job extends Model
         return $this->status === self::FAILED;
     }
 
-    public function generating(): void
+    public function startedGenerating(): void
     {
         $this->changeStatus(self::GENERATING_EVENTS);
     }
@@ -143,7 +169,17 @@ class Job extends Model
         $this->changeStatus(self::EVENTS_GENERATED);
     }
 
-    public function sending(): void
+    public function startedDeleting(): void
+    {
+        $this->changeStatus(self::DELETING_EVENTS);
+    }
+
+    public function eventsDeleted(): void
+    {
+        $this->changeStatus(self::EVENTS_DELETED);
+    }
+
+    public function startedSending(): void
     {
         $this->changeStatus(self::SENDING_EVENTS);
     }
