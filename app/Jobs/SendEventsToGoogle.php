@@ -54,18 +54,19 @@ class SendEventsToGoogle implements ShouldQueue
 
     private function sendToGoogle(ShiftEvent $shiftEvent): Event
     {
+        $googleEvent = new Event();
+
+        $googleEvent->name = $shiftEvent->getTitle();
+        $googleEvent->description = 'Automatically created for you by '.config('app.name');
+
         if ($shiftEvent->isAllDayEvent()) {
-            return Event::create([
-                'name' => $shiftEvent->getTitle(),
-                'startDate' => $shiftEvent->getStart()->setTimezone('Europe/London'),
-                'endDate' => $shiftEvent->getEnd()->setTimezone('Europe/London'),
-            ]);
+            $googleEvent->startDate = $shiftEvent->getStart()->setTimezone('Europe/London');
+            $googleEvent->endDate = $shiftEvent->getEnd()->setTimezone('Europe/London');
+        } else {
+            $googleEvent->startDateTime = $shiftEvent->getStart()->setTimezone('Europe/London');
+            $googleEvent->endDateTime = $shiftEvent->getEnd()->setTimezone('Europe/London');
         }
 
-        return Event::create([
-            'name' => $shiftEvent->getTitle(),
-            'startDateTime' => $shiftEvent->getStart()->setTimezone('Europe/London'),
-            'endDateTime' => $shiftEvent->getEnd()->setTimezone('Europe/London'),
-        ]);
+        return $googleEvent->save();
     }
 }
