@@ -43,6 +43,7 @@ fi
 
 # Fix permissions
 chgrp -R staff .
+chmod -R g+w .
 
 # Exit maintenance mode
 ./vendor/bin/sail artisan up
