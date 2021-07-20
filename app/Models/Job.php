@@ -19,7 +19,11 @@ class Job extends Model
     private const FAILED = 9;
 
     protected $fillable = ['start', 'end', 'position', 'status'];
-    protected $dates = ['start', 'end'];
+    protected $casts = [
+        'start' => 'date',
+        'end' => 'date',
+        'status' => 'integer',
+    ];
 
     public function getId(): int
     {
