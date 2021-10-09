@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Events\EventsDeleted;
 use App\Models\Job;
 use App\Models\ShiftEvent;
+use App\Traits\Throttable;
 use Google\Service\Exception as GoogleServiceException;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -14,9 +15,11 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
 use Spatie\GoogleCalendar\Event;
 
+use function Psy\sh;
+
 class DeleteEventsFromGoogle implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, Throttable;
 
     private Collection $shiftEvents;
 
@@ -49,17 +52,19 @@ class DeleteEventsFromGoogle implements ShouldQueue
 
     private function deleteEvents(): void
     {
-        /** @var ShiftEvent $shiftEvent */
-        foreach ($this->shiftEvents as $shiftEvent) {
-            try {
-                Event::find($shiftEvent->getGoogleEventId())->delete();
-            } catch (GoogleServiceException $exception) {
-                if ($exception->getCode() !== 410) {
-                    throw $exception;
+        $this->throttle($this->shiftEvents, 50, function (Collection $shiftEvents) {
+            /** @var ShiftEvent $shiftEvent */
+            foreach ($shiftEvents as $shiftEvent) {
+                try {
+                    Event::find($shiftEvent->getGoogleEventId())->delete();
+                } catch (GoogleServiceException $exception) {
+                    if ($exception->getCode() !== 410) {
+                        throw $exception;
+                    }
                 }
+                $shiftEvent->delete();
+                $this->eventsJob->incrementNumberOfEventsDeletedFromGoogle();
             }
-            $shiftEvent->delete();
-            $this->eventsJob->incrementNumberOfEventsDeletedFromGoogle();
-        }
+        });
     }
 }

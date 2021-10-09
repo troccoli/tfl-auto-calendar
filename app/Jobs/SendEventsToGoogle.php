@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Events\EventsSent;
 use App\Models\Job;
 use App\Models\ShiftEvent;
+use App\Traits\Throttable;
 use Illuminate\Bus\Batchable;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -16,7 +17,7 @@ use Spatie\GoogleCalendar\Event;
 
 class SendEventsToGoogle implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, Batchable;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, Batchable, Throttable;
 
     private Collection $shiftEvents;
 
@@ -43,16 +44,18 @@ class SendEventsToGoogle implements ShouldQueue
 
     private function sendEvents(): void
     {
-        /** @var ShiftEvent $shiftEvent */
-        foreach ($this->shiftEvents as $shiftEvent) {
-            if ($shiftEvent->hasBeenSent()) {
-                continue;
+        $this->throttle($this->shiftEvents, 50, function (Collection $shiftEvents) {
+            /** @var ShiftEvent $shiftEvent */
+            foreach ($shiftEvents as $shiftEvent) {
+                if ($shiftEvent->hasBeenSent()) {
+                    continue;
+                }
+                $googleEvent = $this->sendToGoogle($shiftEvent);
+                $shiftEvent->setGoogleEventId($googleEvent->id);
+                $shiftEvent->save();
+                $this->eventsJob->incrementNumberOfEventsSentToGoogle();
             }
-            $googleEvent = $this->sendToGoogle($shiftEvent);
-            $shiftEvent->setGoogleEventId($googleEvent->id);
-            $shiftEvent->save();
-            $this->eventsJob->incrementNumberOfEventsSentToGoogle();
-        }
+        });
     }
 
     private function sendToGoogle(ShiftEvent $shiftEvent): Event
