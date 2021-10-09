@@ -45,6 +45,9 @@ class SendEventsToGoogle implements ShouldQueue
     {
         /** @var ShiftEvent $shiftEvent */
         foreach ($this->shiftEvents as $shiftEvent) {
+            if ($shiftEvent->hasBeenSent()) {
+                continue;
+            }
             $googleEvent = $this->sendToGoogle($shiftEvent);
             $shiftEvent->setGoogleEventId($googleEvent->id);
             $shiftEvent->save();
