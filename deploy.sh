@@ -10,6 +10,14 @@ fi
 
 echo "Deploying application ..."
 
+# Update code
+git checkout main
+git pull
+
+# Fix permissions
+chgrp -R staff .
+chmod -R g+w .
+
 # Start servers
 ./vendor/bin/sail up -d
 
@@ -41,14 +49,14 @@ fi
 # Rebuild artifacts
 ./vendor/bin/sail npm run dev
 
-# Fix permissions
-chgrp -R staff .
-chmod -R g+w .
-
 # Exit maintenance mode
 ./vendor/bin/sail artisan up
 
 # Shut down servers
 ./vendor/bin/sail down
+
+# Fix permissions
+chgrp -R staff .
+chmod -R g+w .
 
 echo "Application deployed!"
