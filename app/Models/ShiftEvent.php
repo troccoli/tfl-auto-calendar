@@ -85,4 +85,9 @@ class ShiftEvent extends Model
 
         return $this;
     }
+
+    public function hasBeenSent(): bool
+    {
+        return !is_null($this->google_id);
+    }
 }
